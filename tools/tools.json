@@ -5,7 +5,7 @@
       "id": "frailty-key-domain",
       "name": "Frailty Assessment",
       "description": "3-domain frailty assessment across mobility, ADLs, and medical complexity.",
-      "icon": "⚕︎",
+      "icon": "assist-walker",
       "file": "tools/frailty.json"
     }
   ]
