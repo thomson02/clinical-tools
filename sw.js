@@ -1,4 +1,4 @@
-const CACHE_NAME = 'clinical-tools-v3'
+const CACHE_NAME = 'clinical-tools-1770332359'
 const CORE_ASSETS = [
   '/',
   '/index.html',
