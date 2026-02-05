@@ -1,6 +1,6 @@
 {
   "id": "frailty-key-domain",
-  "name": "Frailty Assessment – Key Domains",
+  "name": "Frailty Assessment",
   "description": "Mobility, ADLs, and medical complexity combined into a 12-point frailty score.",
   "version": 1,
   "questions": [

@@ -61,15 +61,6 @@ export default function App() {
   const [showSplash, setShowSplash] = useState(true)
   const [query, setQuery] = useState('')
   const [filterTab, setFilterTab] = useState('all')
-  const [toast, setToast] = useState('')
-  const [favorites, setFavorites] = useState(() => {
-    if (typeof window === 'undefined') return []
-    try {
-      return JSON.parse(localStorage.getItem('favorites') || '[]')
-    } catch {
-      return []
-    }
-  })
   const [recent, setRecent] = useState(() => {
     if (typeof window === 'undefined') return []
     try {
@@ -201,29 +192,11 @@ export default function App() {
 
   const backToHome = () => setState(initialState)
 
-  const toggleFavorite = (toolId) => {
-    setFavorites((prev) => {
-      const isFav = prev.includes(toolId)
-      const next = isFav ? prev.filter((id) => id !== toolId) : [...prev, toolId]
-      localStorage.setItem('favorites', JSON.stringify(next))
-      setToast(isFav ? 'Removed from favorites' : 'Added to favorites')
-      return next
-    })
-  }
-
-  useEffect(() => {
-    if (!toast) return
-    const timer = setTimeout(() => setToast(''), 1400)
-    return () => clearTimeout(timer)
-  }, [toast])
-
   const filteredTools = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
     let base = tools
 
-    if (filterTab === 'favorites') {
-      base = base.filter((tool) => favorites.includes(tool.id))
-    } else if (filterTab === 'recent') {
+    if (filterTab === 'recent') {
       base = recent
         .map((id) => tools.find((tool) => tool.id === id))
         .filter(Boolean)
@@ -236,7 +209,7 @@ export default function App() {
         tool.description.toLowerCase().includes(normalizedQuery)
       )
     })
-  }, [tools, query, filterTab, favorites, recent])
+  }, [tools, query, filterTab, recent])
 
   return (
     <div className="app">
@@ -251,11 +224,8 @@ export default function App() {
       )}
       <header className="topbar">
         <div className="brand">
-          <img className="brand-icon" src="/logo.jpg" alt="Strathgryffe Medical Practice" />
-          <div>
-            <div className="brand-title">Clinical Tools</div>
-            <div className="brand-sub">Fast bedside calculators</div>
-          </div>
+          <img className="brand-icon" src="/icon.png" alt="Strathgryffe Medical Practice" />
+          <img className="brand-text" src="/text.png" alt="Strathgryffe Medical Practice" />
         </div>
         {state.screen === 'home' && (
           <div className="search">
@@ -269,7 +239,7 @@ export default function App() {
             </span>
             <input
               type="search"
-              placeholder="Search calculators (e.g. frailty, NEWS2)"
+              placeholder="Search calculators (e.g. frailty)"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -277,7 +247,7 @@ export default function App() {
         )}
       </header>
 
-      {showInstall && (
+      {showInstall && state.screen === 'home' && (
         <section className="banner">
           <div className="banner-text">
             Install this app: tap the Share icon and select “Add to Home Screen”.
@@ -286,11 +256,6 @@ export default function App() {
             Dismiss
           </button>
         </section>
-      )}
-      {toast && (
-        <div className="toast" role="status" aria-live="polite">
-          {toast}
-        </div>
       )}
 
       {updating && (
@@ -308,8 +273,6 @@ export default function App() {
             <div className="section-hint">
               {filterTab === 'recent'
                 ? 'Recent calculators'
-                : filterTab === 'favorites'
-                ? 'Favourite calculators'
                 : 'Available calculators'}
             </div>
             <div className="tool-list">
@@ -324,32 +287,13 @@ export default function App() {
                     <div className="tool-title">{tool.name}</div>
                     <div className="tool-desc">{tool.description}</div>
                   </div>
-                  <button
-                    type="button"
-                    className={`fav ${favorites.includes(tool.id) ? 'active' : ''}`}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      toggleFavorite(tool.id)
-                    }}
-                    aria-label={
-                      favorites.includes(tool.id)
-                        ? 'Remove from favorites'
-                        : 'Add to favorites'
-                    }
-                  >
-                    {favorites.includes(tool.id) ? '★' : '☆'}
-                  </button>
                   <div className="tool-cta" aria-hidden="true">›</div>
                 </button>
               ))}
             </div>
             {filteredTools.length === 0 && (
               <div className="card empty">
-                {filterTab === 'favorites'
-                  ? 'Star calculators to save them here.'
-                  : filterTab === 'recent'
-                  ? 'No recent calculators yet.'
-                  : 'No calculators found.'}
+                {filterTab === 'recent' ? 'No recent calculators yet.' : 'No calculators found.'}
               </div>
             )}
           </section>
@@ -485,15 +429,6 @@ export default function App() {
           >
             <span className="tab-icon">⏱</span>
             Recent
-          </button>
-          <button
-            className={`tab ${filterTab === 'favorites' ? 'active' : ''}`}
-            onClick={() => setFilterTab('favorites')}
-            role="tab"
-            aria-selected={filterTab === 'favorites'}
-          >
-            <span className="tab-icon">★</span>
-            Favorites
           </button>
         </nav>
       )}
