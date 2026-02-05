@@ -25,8 +25,8 @@ jobs:
 
       - name: Bump service worker cache
         run: |
-          ts=$(date +%s)
-          sed -i.bak "s/^const CACHE_NAME = .*/const CACHE_NAME = 'clinical-tools-$ts'/" public/sw.js
+          sha=$(git rev-parse --short HEAD)
+          sed -i.bak "s/^const CACHE_NAME = .*/const CACHE_NAME = 'clinical-tools-$sha'/" public/sw.js
           rm public/sw.js.bak
 
       - name: Build
