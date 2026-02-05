@@ -6,7 +6,7 @@
       "name": "Frailty Assessment",
       "description": "3-domain frailty assessment across mobility, ADLs, and medical complexity.",
       "icon": "⚕︎",
-      "file": "/tools/frailty.json"
+      "file": "tools/frailty.json"
     }
   ]
 }

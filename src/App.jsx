@@ -73,7 +73,7 @@ export default function App() {
   useEffect(() => {
     const loadTools = async () => {
       try {
-        const res = await fetch('/tools/tools.json')
+        const res = await fetch(`${import.meta.env.BASE_URL}tools/tools.json`)
         if (!res.ok) throw new Error('Failed to load tools')
         const data = await res.json()
         setTools(data.tools || [])
@@ -138,7 +138,7 @@ export default function App() {
         localStorage.setItem('recent', JSON.stringify(next))
         return next
       })
-      const res = await fetch(toolRef.file)
+      const res = await fetch(`${import.meta.env.BASE_URL}${toolRef.file}`)
       if (!res.ok) throw new Error('Failed to load tool')
       const tool = await res.json()
       setState({
@@ -216,7 +216,11 @@ export default function App() {
       {showSplash && (
         <div className="splash" role="status" aria-live="polite">
           <div className="splash-card">
-            <img className="splash-logo" src="/logo.jpg" alt="Strathgryffe Medical Practice" />
+            <img
+              className="splash-logo"
+              src={`${import.meta.env.BASE_URL}logo.jpg`}
+              alt="Strathgryffe Medical Practice"
+            />
             <div className="splash-title">Clinical Tools</div>
             <div className="splash-sub">Loading tools...</div>
           </div>
@@ -224,8 +228,16 @@ export default function App() {
       )}
       <header className="topbar">
         <div className="brand">
-          <img className="brand-icon" src="/icon.png" alt="Strathgryffe Medical Practice" />
-          <img className="brand-text" src="/text.png" alt="Strathgryffe Medical Practice" />
+          <img
+            className="brand-icon"
+            src={`${import.meta.env.BASE_URL}icon.png`}
+            alt="Strathgryffe Medical Practice"
+          />
+          <img
+            className="brand-text"
+            src={`${import.meta.env.BASE_URL}text.png`}
+            alt="Strathgryffe Medical Practice"
+          />
         </div>
         {state.screen === 'home' && (
           <div className="search">
