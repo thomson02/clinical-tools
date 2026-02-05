@@ -23,6 +23,12 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Bump service worker cache
+        run: |
+          ts=$(date +%s)
+          sed -i.bak "s/^const CACHE_NAME = .*/const CACHE_NAME = 'clinical-tools-$ts'/" public/sw.js
+          rm public/sw.js.bak
+
       - name: Build
         run: npm run build
 
