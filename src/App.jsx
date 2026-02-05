@@ -259,15 +259,28 @@ export default function App() {
         )}
       </header>
 
-      {showInstall && state.screen === 'home' && (
-        <section className="banner">
-          <div className="banner-text">
-            Install this app: tap the Share icon and select “Add to Home Screen”.
-          </div>
-          <button className="ghost" onClick={() => setShowInstall(false)}>
-            Dismiss
+      {state.screen === 'question' && currentQuestion && (
+        <div className="tool-bar full">
+          <button className="tool-nav icon" onClick={goBack} aria-label="Back">
+            {state.index === 0 ? (
+              <span className="tool-home-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5a1 1 0 0 1-1-1v-4.5h-3V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8.5Z"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+            ) : (
+              '‹'
+            )}
           </button>
-        </section>
+          <div className="tool-titlebar">{state.tool.name}</div>
+          <div className="tool-spacer" aria-hidden="true" />
+        </div>
       )}
 
       {updating && (
@@ -276,7 +289,17 @@ export default function App() {
         </section>
       )}
 
-      <main className="content">
+      <main className={`content ${state.screen !== 'home' ? 'content-tight' : ''}`}>
+        {showInstall && state.screen === 'home' && (
+          <section className="banner">
+            <div className="banner-text">
+              Install this app: tap the Share icon and select “Add to Home Screen”.
+            </div>
+            <button className="ghost" onClick={() => setShowInstall(false)}>
+              Dismiss
+            </button>
+          </section>
+        )}
         {loading && <div className="card">Loading tools…</div>}
         {error && <div className="card error">{error}</div>}
 
@@ -313,27 +336,6 @@ export default function App() {
 
         {state.screen === 'question' && currentQuestion && (
           <section className="question">
-            <div className="tool-bar full">
-              <button className="tool-nav icon" onClick={goBack} aria-label="Back">
-                {state.index === 0 ? (
-                  <span className="tool-home-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path
-                        d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5a1 1 0 0 1-1-1v-4.5h-3V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8.5Z"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linejoin="round"
-                      />
-                    </svg>
-                  </span>
-                ) : (
-                  '‹'
-                )}
-              </button>
-              <div className="tool-titlebar">{state.tool.name}</div>
-              <div className="tool-spacer" aria-hidden="true" />
-            </div>
             <div className="progress">
               <div>
                 Question {state.index + 1} of {state.tool.questions.length}
@@ -365,7 +367,10 @@ export default function App() {
                   >
                     <span className="radio" aria-hidden="true" />
                     <span className="option-text">
-                      {opt.label} <span className="score">({opt.score})</span>
+                      {opt.label}
+                      {typeof opt.score === 'number' && opt.score !== 0 ? (
+                        <span className="score">({opt.score})</span>
+                      ) : null}
                     </span>
                   </button>
                 ))}
