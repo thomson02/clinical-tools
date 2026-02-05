@@ -59,6 +59,7 @@ export default function App() {
   const [showInstall, setShowInstall] = useState(false)
   const [updating, setUpdating] = useState(false)
   const [showSplash, setShowSplash] = useState(true)
+  const [screenFade, setScreenFade] = useState(false)
   const [query, setQuery] = useState('')
   const [filterTab, setFilterTab] = useState('all')
   const [recent, setRecent] = useState(() => {
@@ -190,7 +191,13 @@ export default function App() {
     setState({ screen: 'question', tool: state.tool, index: 0, answers: {} })
   }
 
-  const backToHome = () => setState(initialState)
+  const backToHome = () => {
+    setScreenFade(true)
+    setTimeout(() => {
+      setState(initialState)
+      setScreenFade(false)
+    }, 180)
+  }
 
   const filteredTools = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -260,26 +267,36 @@ export default function App() {
       </header>
 
       {state.screen === 'question' && currentQuestion && (
-        <div className="tool-bar full">
-          <button className="tool-nav icon" onClick={goBack} aria-label="Back">
-            {state.index === 0 ? (
-              <span className="tool-home-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5a1 1 0 0 1-1-1v-4.5h-3V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8.5Z"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linejoin="round"
-                  />
-                </svg>
-              </span>
-            ) : (
-              '‹'
-            )}
-          </button>
-          <div className="tool-titlebar">{state.tool.name}</div>
-          <div className="tool-spacer" aria-hidden="true" />
+        <div className="tool-header">
+          <div className="tool-bar full">
+            <button className="tool-nav icon" onClick={goBack} aria-label="Back">
+              {state.index === 0 ? (
+                <span className="tool-home-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5a1 1 0 0 1-1-1v-4.5h-3V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8.5Z"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+              ) : (
+                '‹'
+              )}
+            </button>
+            <div className="tool-titlebar">{state.tool.name}</div>
+            <div className="tool-spacer" aria-hidden="true" />
+          </div>
+          <div className="progress-compact" aria-hidden="true">
+            <div
+              className="progress-fill"
+              style={{
+                width: `${((state.index + 1) / state.tool.questions.length) * 100}%`
+              }}
+            />
+          </div>
         </div>
       )}
 
@@ -289,7 +306,11 @@ export default function App() {
         </section>
       )}
 
-      <main className={`content ${state.screen !== 'home' ? 'content-tight' : ''}`}>
+      <main
+        className={`content ${state.screen !== 'home' ? 'content-tight' : ''} ${
+          screenFade ? 'fade-out' : ''
+        }`}
+      >
         {showInstall && state.screen === 'home' && (
           <section className="banner">
             <div className="banner-text">
@@ -336,20 +357,6 @@ export default function App() {
 
         {state.screen === 'question' && currentQuestion && (
           <section className="question">
-            <div className="progress">
-              <div>
-                Question {state.index + 1} of {state.tool.questions.length}
-              </div>
-              <div className="progress-bar">
-                <div
-                  className="progress-fill"
-                  style={{
-                    width: `${((state.index + 1) / state.tool.questions.length) * 100}%`
-                  }}
-                />
-              </div>
-            </div>
-
             <div className="card question-card">
               <h2>{currentQuestion.title}</h2>
               {currentQuestion.help && (
@@ -368,9 +375,6 @@ export default function App() {
                     <span className="radio" aria-hidden="true" />
                     <span className="option-text">
                       {opt.label}
-                      {typeof opt.score === 'number' && opt.score !== 0 ? (
-                        <span className="score">({opt.score})</span>
-                      ) : null}
                     </span>
                   </button>
                 ))}
