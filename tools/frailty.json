@@ -1,0 +1,143 @@
+{
+  "id": "frailty-key-domain",
+  "name": "Frailty Assessment",
+  "description": "Mobility, ADLs, and medical complexity combined into a 12-point frailty score.",
+  "version": 1,
+  "questions": [
+    {
+      "id": "mobility",
+      "title": "Mobility",
+      "help": "Select the option that best describes the patient.",
+      "type": "single",
+      "options": [
+        {
+          "id": "mobility-0",
+          "label": "Fully independent, no mobility issues",
+          "score": 0
+        },
+        {
+          "id": "mobility-1",
+          "label": "Slower but independent",
+          "score": 1
+        },
+        {
+          "id": "mobility-2",
+          "label": "Uses walking aid or occasional assistance",
+          "score": 2
+        },
+        {
+          "id": "mobility-3",
+          "label": "Requires assistance to mobilise",
+          "score": 3
+        },
+        {
+          "id": "mobility-4",
+          "label": "Chair or bed bound most of the time",
+          "score": 4
+        }
+      ]
+    },
+    {
+      "id": "adl",
+      "title": "Activities of Daily Living (ADLs)",
+      "help": "Consider washing, dressing, toileting, feeding.",
+      "type": "single",
+      "options": [
+        {
+          "id": "adl-0",
+          "label": "Fully independent",
+          "score": 0
+        },
+        {
+          "id": "adl-1",
+          "label": "Mild difficulty but manages alone",
+          "score": 1
+        },
+        {
+          "id": "adl-2",
+          "label": "Needs some assistance",
+          "score": 2
+        },
+        {
+          "id": "adl-3",
+          "label": "Needs significant assistance",
+          "score": 3
+        },
+        {
+          "id": "adl-4",
+          "label": "Fully dependent for personal care",
+          "score": 4
+        }
+      ]
+    },
+    {
+      "id": "medical",
+      "title": "Medical Complexity & Cognition",
+      "help": "Consider comorbidities, polypharmacy, cognition, and impact on function.",
+      "type": "single",
+      "options": [
+        {
+          "id": "medical-0",
+          "label": "No significant medical problems",
+          "score": 0
+        },
+        {
+          "id": "medical-1",
+          "label": "One or two stable chronic conditions",
+          "score": 1
+        },
+        {
+          "id": "medical-2",
+          "label": "Multiple conditions requiring regular management",
+          "score": 2
+        },
+        {
+          "id": "medical-3",
+          "label": "Significant functional or cognitive impairment",
+          "score": 3
+        },
+        {
+          "id": "medical-4",
+          "label": "Severe comorbidity and/or advanced cognitive impairment",
+          "score": 4
+        }
+      ]
+    }
+  ],
+  "scoring": {
+    "type": "sum",
+    "max": 12,
+    "bands": [
+      {
+        "min": 0,
+        "max": 2,
+        "label": "Fit / Well",
+        "action": "No frailty identified. Continue routine care and monitoring per local guidance."
+      },
+      {
+        "min": 3,
+        "max": 4,
+        "label": "Vulnerable (Pre-frail)",
+        "action": "Consider early intervention and risk reduction strategies per local guidance."
+      },
+      {
+        "min": 5,
+        "max": 6,
+        "label": "Mild Frailty",
+        "action": "Consider targeted assessment and support needs per local guidance."
+      },
+      {
+        "min": 7,
+        "max": 9,
+        "label": "Moderate Frailty",
+        "action": "Consider comprehensive assessment and multidisciplinary support per local guidance."
+      },
+      {
+        "min": 10,
+        "max": 12,
+        "label": "Severe Frailty",
+        "action": "Consider urgent comprehensive assessment and care planning per local guidance."
+      }
+    ]
+  }
+}
