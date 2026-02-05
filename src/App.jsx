@@ -165,7 +165,7 @@ export default function App() {
         }
         return { ...prev, index: prev.index + 1 }
       })
-    }, 120)
+    }, 220)
   }
 
   const goNext = () => {
@@ -218,7 +218,7 @@ export default function App() {
           <div className="splash-card">
             <img className="splash-logo" src="/logo.jpg" alt="Strathgryffe Medical Practice" />
             <div className="splash-title">Clinical Tools</div>
-            <div className="splash-sub">Loading calculators…</div>
+            <div className="splash-sub">Loading tools...</div>
           </div>
         </div>
       )}
@@ -239,7 +239,7 @@ export default function App() {
             </span>
             <input
               type="search"
-              placeholder="Search calculators (e.g. frailty)"
+              placeholder="Search tools (e.g. frailty)"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -272,8 +272,8 @@ export default function App() {
           <section>
             <div className="section-hint">
               {filterTab === 'recent'
-                ? 'Recent calculators'
-                : 'Available calculators'}
+                ? 'Recent tools'
+                : 'Available tools'}
             </div>
             <div className="tool-list">
               {filteredTools.map((tool) => (
@@ -293,7 +293,7 @@ export default function App() {
             </div>
             {filteredTools.length === 0 && (
               <div className="card empty">
-                {filterTab === 'recent' ? 'No recent calculators yet.' : 'No calculators found.'}
+                {filterTab === 'recent' ? 'No recent tools yet.' : 'No tools found.'}
               </div>
             )}
           </section>
@@ -303,19 +303,24 @@ export default function App() {
           <section className="question">
             <div className="tool-bar full">
               <button className="tool-nav icon" onClick={goBack} aria-label="Back">
-                {state.index === 0 ? '⌂' : '‹'}
+                {state.index === 0 ? (
+                  <span className="tool-home-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5a1 1 0 0 1-1-1v-4.5h-3V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8.5Z"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  </span>
+                ) : (
+                  '‹'
+                )}
               </button>
               <div className="tool-titlebar">{state.tool.name}</div>
-              <button
-                className="tool-nav primary icon"
-                onClick={goNext}
-                disabled={!state.answers[currentQuestion.id]}
-                aria-label={
-                  state.index === state.tool.questions.length - 1 ? 'Calculate' : 'Next'
-                }
-              >
-                ›
-              </button>
+              <div className="tool-spacer" aria-hidden="true" />
             </div>
             <div className="progress">
               <div>
@@ -418,7 +423,17 @@ export default function App() {
             role="tab"
             aria-selected={filterTab === 'all'}
           >
-            <span className="tab-icon">⌂</span>
+            <span className="tab-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M4 11.5 12 5l8 6.5V20a1 1 0 0 1-1 1h-4.5a1 1 0 0 1-1-1v-4.5h-3V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-8.5Z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
             Home
           </button>
           <button
@@ -427,7 +442,25 @@ export default function App() {
             role="tab"
             aria-selected={filterTab === 'recent'}
           >
-            <span className="tab-icon">⏱</span>
+            <span className="tab-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle
+                  cx="12"
+                  cy="12"
+                  r="8"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                />
+                <path
+                  d="M12 8v4l3 2"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </span>
             Recent
           </button>
         </nav>
