@@ -3,7 +3,7 @@
   "tools": [
     {
       "id": "frailty-key-domain",
-      "name": "Frailty Key Domain Score",
+      "name": "Frailty Assessment – Key Domains",
       "description": "3-domain frailty assessment across mobility, ADLs, and medical complexity.",
       "icon": "🧓",
       "file": "/tools/frailty.json"

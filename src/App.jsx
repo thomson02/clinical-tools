@@ -50,6 +50,24 @@ export default function App() {
   const [showInstall, setShowInstall] = useState(false)
   const [updating, setUpdating] = useState(false)
   const [showSplash, setShowSplash] = useState(true)
+  const [query, setQuery] = useState('')
+  const [filterTab, setFilterTab] = useState('all')
+  const [favorites, setFavorites] = useState(() => {
+    if (typeof window === 'undefined') return []
+    try {
+      return JSON.parse(localStorage.getItem('favorites') || '[]')
+    } catch {
+      return []
+    }
+  })
+  const [recent, setRecent] = useState(() => {
+    if (typeof window === 'undefined') return []
+    try {
+      return JSON.parse(localStorage.getItem('recent') || '[]')
+    } catch {
+      return []
+    }
+  })
 
   useEffect(() => {
     const loadTools = async () => {
@@ -114,6 +132,11 @@ export default function App() {
 
   const startTool = async (toolRef) => {
     try {
+      setRecent((prev) => {
+        const next = [toolRef.id, ...prev.filter((id) => id !== toolRef.id)].slice(0, 8)
+        localStorage.setItem('recent', JSON.stringify(next))
+        return next
+      })
       const res = await fetch(toolRef.file)
       if (!res.ok) throw new Error('Failed to load tool')
       const tool = await res.json()
@@ -159,6 +182,37 @@ export default function App() {
 
   const backToHome = () => setState(initialState)
 
+  const toggleFavorite = (toolId) => {
+    setFavorites((prev) => {
+      const next = prev.includes(toolId)
+        ? prev.filter((id) => id !== toolId)
+        : [...prev, toolId]
+      localStorage.setItem('favorites', JSON.stringify(next))
+      return next
+    })
+  }
+
+  const filteredTools = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase()
+    let base = tools
+
+    if (filterTab === 'favorites') {
+      base = base.filter((tool) => favorites.includes(tool.id))
+    } else if (filterTab === 'recent') {
+      base = recent
+        .map((id) => tools.find((tool) => tool.id === id))
+        .filter(Boolean)
+    }
+
+    if (!normalizedQuery) return base
+    return base.filter((tool) => {
+      return (
+        tool.name.toLowerCase().includes(normalizedQuery) ||
+        tool.description.toLowerCase().includes(normalizedQuery)
+      )
+    })
+  }, [tools, query, filterTab, favorites, recent])
+
   return (
     <div className="app">
       {showSplash && (
@@ -178,6 +232,16 @@ export default function App() {
             <div className="brand-sub">Fast bedside calculators</div>
           </div>
         </div>
+        {state.screen === 'home' && (
+          <div className="search">
+            <input
+              type="search"
+              placeholder="Search calculators"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+        )}
       </header>
 
       {showInstall && (
@@ -203,9 +267,8 @@ export default function App() {
 
         {!loading && !error && state.screen === 'home' && (
           <section>
-            <h1 className="section-title">Calculator Library</h1>
             <div className="tool-list">
-              {tools.map((tool) => (
+              {filteredTools.map((tool) => (
                 <button
                   key={tool.id}
                   className="tool-card"
@@ -216,15 +279,49 @@ export default function App() {
                     <div className="tool-title">{tool.name}</div>
                     <div className="tool-desc">{tool.description}</div>
                   </div>
+                  <button
+                    type="button"
+                    className={`fav ${favorites.includes(tool.id) ? 'active' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      toggleFavorite(tool.id)
+                    }}
+                    aria-label={
+                      favorites.includes(tool.id)
+                        ? 'Remove from favorites'
+                        : 'Add to favorites'
+                    }
+                  >
+                    ★
+                  </button>
                   <div className="tool-cta" aria-hidden="true">›</div>
                 </button>
               ))}
             </div>
+            {filteredTools.length === 0 && (
+              <div className="card empty">No calculators found.</div>
+            )}
           </section>
         )}
 
         {state.screen === 'question' && currentQuestion && (
           <section className="question">
+            <div className="tool-bar full">
+              <button className="tool-nav icon" onClick={goBack} aria-label="Back">
+                {state.index === 0 ? '⌂' : '‹'}
+              </button>
+              <div className="tool-titlebar">{state.tool.name}</div>
+              <button
+                className="tool-nav primary icon"
+                onClick={goNext}
+                disabled={!state.answers[currentQuestion.id]}
+                aria-label={
+                  state.index === state.tool.questions.length - 1 ? 'Calculate' : 'Next'
+                }
+              >
+                ›
+              </button>
+            </div>
             <div className="progress">
               <div>
                 Question {state.index + 1} of {state.tool.questions.length}
@@ -246,33 +343,23 @@ export default function App() {
               )}
               <div className="options">
                 {currentQuestion.options.map((opt) => (
-                  <label key={opt.id} className="option">
-                    <input
-                      type="radio"
-                      name={currentQuestion.id}
-                      checked={state.answers[currentQuestion.id] === opt.id}
-                      onChange={() => onSelect(currentQuestion.id, opt.id)}
-                    />
-                    <span>
+                  <button
+                    key={opt.id}
+                    type="button"
+                    className={`option ${state.answers[currentQuestion.id] === opt.id ? 'selected' : ''}`}
+                    onClick={() => onSelect(currentQuestion.id, opt.id)}
+                    role="radio"
+                    aria-checked={state.answers[currentQuestion.id] === opt.id}
+                  >
+                    <span className="tick" aria-hidden="true">✓</span>
+                    <span className="option-text">
                       {opt.label} <span className="score">({opt.score})</span>
                     </span>
-                  </label>
+                  </button>
                 ))}
               </div>
             </div>
 
-            <div className="actions">
-              <button className="ghost" onClick={goBack}>
-                {state.index === 0 ? 'Back to menu' : 'Back'}
-              </button>
-              <button
-                className="primary"
-                onClick={goNext}
-                disabled={!state.answers[currentQuestion.id]}
-              >
-                {state.index === state.tool.questions.length - 1 ? 'Calculate' : 'Next'}
-              </button>
-            </div>
           </section>
         )}
 
@@ -308,17 +395,48 @@ export default function App() {
               </ul>
             </div>
 
-            <div className="actions">
-              <button className="ghost" onClick={backToHome}>
-                Back to menu
-              </button>
-              <button className="primary" onClick={restartTool}>
+            <div className="actions native-actions">
+              <button className="native primary" onClick={restartTool}>
                 Start again
+              </button>
+              <button className="native secondary" onClick={backToHome}>
+                Back to menu
               </button>
             </div>
           </section>
         )}
       </main>
+      {state.screen === 'home' && (
+        <nav className="toolbar" role="tablist" aria-label="Tool filters">
+          <button
+            className={`tab ${filterTab === 'all' ? 'active' : ''}`}
+            onClick={() => setFilterTab('all')}
+            role="tab"
+            aria-selected={filterTab === 'all'}
+          >
+            <span className="tab-icon">▦</span>
+            All
+          </button>
+          <button
+            className={`tab ${filterTab === 'recent' ? 'active' : ''}`}
+            onClick={() => setFilterTab('recent')}
+            role="tab"
+            aria-selected={filterTab === 'recent'}
+          >
+            <span className="tab-icon">⏱</span>
+            Recent
+          </button>
+          <button
+            className={`tab ${filterTab === 'favorites' ? 'active' : ''}`}
+            onClick={() => setFilterTab('favorites')}
+            role="tab"
+            aria-selected={filterTab === 'favorites'}
+          >
+            <span className="tab-icon">★</span>
+            Favorites
+          </button>
+        </nav>
+      )}
     </div>
   )
 }
