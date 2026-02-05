@@ -1,10 +1,11 @@
-const CACHE_NAME = 'clinical-tools-v1'
+const CACHE_NAME = 'clinical-tools-v2'
 const CORE_ASSETS = [
   '/',
   '/index.html',
   '/manifest.webmanifest',
   '/icons/icon-192.svg',
   '/icons/icon-512.svg',
+  '/logo.jpg',
   '/splash/splash-640x1136.png',
   '/splash/splash-750x1334.png',
   '/splash/splash-828x1792.png',

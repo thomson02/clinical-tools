@@ -42,6 +42,15 @@ function computeResult(tool, answers) {
   return { total, details, band }
 }
 
+function getBandMeta(label) {
+  const value = label.toLowerCase()
+  if (value.includes('severe')) return { tone: 'severe', icon: '⚠️' }
+  if (value.includes('moderate')) return { tone: 'moderate', icon: '⚠️' }
+  if (value.includes('mild')) return { tone: 'mild', icon: 'ℹ️' }
+  if (value.includes('vulnerable')) return { tone: 'mild', icon: 'ℹ️' }
+  return { tone: 'calm', icon: 'ℹ️' }
+}
+
 export default function App() {
   const [tools, setTools] = useState([])
   const [loading, setLoading] = useState(true)
@@ -52,6 +61,7 @@ export default function App() {
   const [showSplash, setShowSplash] = useState(true)
   const [query, setQuery] = useState('')
   const [filterTab, setFilterTab] = useState('all')
+  const [toast, setToast] = useState('')
   const [favorites, setFavorites] = useState(() => {
     if (typeof window === 'undefined') return []
     try {
@@ -156,6 +166,15 @@ export default function App() {
       ...prev,
       answers: { ...prev.answers, [questionId]: optionId }
     }))
+    setTimeout(() => {
+      setState((prev) => {
+        if (!prev.tool) return prev
+        if (prev.index >= prev.tool.questions.length - 1) {
+          return { ...prev, screen: 'result' }
+        }
+        return { ...prev, index: prev.index + 1 }
+      })
+    }, 120)
   }
 
   const goNext = () => {
@@ -184,13 +203,19 @@ export default function App() {
 
   const toggleFavorite = (toolId) => {
     setFavorites((prev) => {
-      const next = prev.includes(toolId)
-        ? prev.filter((id) => id !== toolId)
-        : [...prev, toolId]
+      const isFav = prev.includes(toolId)
+      const next = isFav ? prev.filter((id) => id !== toolId) : [...prev, toolId]
       localStorage.setItem('favorites', JSON.stringify(next))
+      setToast(isFav ? 'Removed from favorites' : 'Added to favorites')
       return next
     })
   }
+
+  useEffect(() => {
+    if (!toast) return
+    const timer = setTimeout(() => setToast(''), 1400)
+    return () => clearTimeout(timer)
+  }, [toast])
 
   const filteredTools = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase()
@@ -218,7 +243,7 @@ export default function App() {
       {showSplash && (
         <div className="splash" role="status" aria-live="polite">
           <div className="splash-card">
-            <div className="splash-logo">+</div>
+            <img className="splash-logo" src="/logo.jpg" alt="Strathgryffe Medical Practice" />
             <div className="splash-title">Clinical Tools</div>
             <div className="splash-sub">Loading calculators…</div>
           </div>
@@ -226,7 +251,7 @@ export default function App() {
       )}
       <header className="topbar">
         <div className="brand">
-          <span className="brand-icon">+</span>
+          <img className="brand-icon" src="/logo.jpg" alt="Strathgryffe Medical Practice" />
           <div>
             <div className="brand-title">Clinical Tools</div>
             <div className="brand-sub">Fast bedside calculators</div>
@@ -234,9 +259,17 @@ export default function App() {
         </div>
         {state.screen === 'home' && (
           <div className="search">
+            <span className="search-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Zm0-12a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm9.7 14.3-4.2-4.2 1.4-1.4 4.2 4.2-1.4 1.4Z"
+                  fill="currentColor"
+                />
+              </svg>
+            </span>
             <input
               type="search"
-              placeholder="Search calculators"
+              placeholder="Search calculators (e.g. frailty, NEWS2)"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
             />
@@ -254,6 +287,11 @@ export default function App() {
           </button>
         </section>
       )}
+      {toast && (
+        <div className="toast" role="status" aria-live="polite">
+          {toast}
+        </div>
+      )}
 
       {updating && (
         <section className="banner updating">
@@ -267,6 +305,13 @@ export default function App() {
 
         {!loading && !error && state.screen === 'home' && (
           <section>
+            <div className="section-hint">
+              {filterTab === 'recent'
+                ? 'Recent calculators'
+                : filterTab === 'favorites'
+                ? 'Favourite calculators'
+                : 'Available calculators'}
+            </div>
             <div className="tool-list">
               {filteredTools.map((tool) => (
                 <button
@@ -292,14 +337,20 @@ export default function App() {
                         : 'Add to favorites'
                     }
                   >
-                    ★
+                    {favorites.includes(tool.id) ? '★' : '☆'}
                   </button>
                   <div className="tool-cta" aria-hidden="true">›</div>
                 </button>
               ))}
             </div>
             {filteredTools.length === 0 && (
-              <div className="card empty">No calculators found.</div>
+              <div className="card empty">
+                {filterTab === 'favorites'
+                  ? 'Star calculators to save them here.'
+                  : filterTab === 'recent'
+                  ? 'No recent calculators yet.'
+                  : 'No calculators found.'}
+              </div>
             )}
           </section>
         )}
@@ -351,7 +402,7 @@ export default function App() {
                     role="radio"
                     aria-checked={state.answers[currentQuestion.id] === opt.id}
                   >
-                    <span className="tick" aria-hidden="true">✓</span>
+                    <span className="radio" aria-hidden="true" />
                     <span className="option-text">
                       {opt.label} <span className="score">({opt.score})</span>
                     </span>
@@ -374,10 +425,20 @@ export default function App() {
                 </div>
               </div>
               {result.band && (
-                <div className="band">
-                  <div className="band-title">{result.band.label}</div>
-                  <div className="band-action">{result.band.action}</div>
-                </div>
+                (() => {
+                  const meta = getBandMeta(result.band.label)
+                  return (
+                    <div className={`band ${meta.tone}`}>
+                      <div className="band-title">
+                        <span className="band-icon" aria-hidden="true">
+                          {meta.icon}
+                        </span>
+                        {result.band.label}
+                      </div>
+                      <div className="band-action">{result.band.action}</div>
+                    </div>
+                  )
+                })()
               )}
             </div>
 
@@ -386,10 +447,9 @@ export default function App() {
               <ul className="summary">
                 {result.details.map((item) => (
                   <li key={item.id}>
-                    <span>{item.title}</span>
-                    <span>
-                      {item.answer} <em>{item.score}</em>
-                    </span>
+                    <span className="summary-title">{item.title}</span>
+                    <span className="summary-answer">{item.answer}</span>
+                    <span className="summary-score">{item.score}</span>
                   </li>
                 ))}
               </ul>
@@ -414,8 +474,8 @@ export default function App() {
             role="tab"
             aria-selected={filterTab === 'all'}
           >
-            <span className="tab-icon">▦</span>
-            All
+            <span className="tab-icon">⌂</span>
+            Home
           </button>
           <button
             className={`tab ${filterTab === 'recent' ? 'active' : ''}`}
