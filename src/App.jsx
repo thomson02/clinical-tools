@@ -44,11 +44,55 @@ function computeResult(tool, answers) {
 
 function getBandMeta(label) {
   const value = label.toLowerCase()
-  if (value.includes('severe')) return { tone: 'severe', icon: '⚠️' }
-  if (value.includes('moderate')) return { tone: 'moderate', icon: '⚠️' }
-  if (value.includes('mild')) return { tone: 'mild', icon: 'ℹ️' }
-  if (value.includes('vulnerable')) return { tone: 'mild', icon: 'ℹ️' }
-  return { tone: 'calm', icon: 'ℹ️' }
+  if (value.includes('severe')) return { tone: 'severe', icon: 'alert' }
+  if (value.includes('moderate')) return { tone: 'moderate', icon: 'warning' }
+  if (value.includes('mild')) return { tone: 'mild', icon: 'shield' }
+  if (value.includes('vulnerable')) return { tone: 'mild', icon: 'shield' }
+  return { tone: 'calm', icon: 'shield' }
+}
+
+function BandIcon({ type }) {
+  if (type === 'alert' || type === 'warning') {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M12 3.5 22 20a1 1 0 0 1-.86 1.5H2.86A1 1 0 0 1 2 20l10-16.5Z"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M12 9v5"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+        />
+        <circle cx="12" cy="17" r="1" fill="currentColor" />
+      </svg>
+    )
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M12 3.5 19 6v6.5c0 4.1-3 6.8-7 8.5-4-1.7-7-4.4-7-8.5V6l7-2.5Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+      <path
+        d="m8.5 12.5 2.2 2.2 4.8-4.8"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
 }
 
 export default function App() {
@@ -338,7 +382,58 @@ export default function App() {
                   className="tool-card"
                   onClick={() => startTool(tool)}
                 >
-                  <div className="tool-icon">{tool.icon || '🩺'}</div>
+                  <div className="tool-icon">
+                    {tool.icon === 'assist-walker' ? (
+                      <img
+                        className="tool-icon-img"
+                        src={`${import.meta.env.BASE_URL}assist_walker.svg`}
+                        alt=""
+                      />
+                    ) : tool.icon === 'cane' ? (
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <circle
+                          cx="9"
+                          cy="5"
+                          r="2"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        />
+                        <path
+                          d="M9 7v7l-2 4"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M10 12h4"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M15 8a3 3 0 1 1 0 6h-1v5"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M14 19h3"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    ) : (
+                      tool.icon || '🩺'
+                    )}
+                  </div>
                   <div className="tool-body">
                     <div className="tool-title">{tool.name}</div>
                     <div className="tool-desc">{tool.description}</div>
@@ -401,7 +496,7 @@ export default function App() {
                     <div className={`band ${meta.tone}`}>
                       <div className="band-title">
                         <span className="band-icon" aria-hidden="true">
-                          {meta.icon}
+                          <BandIcon type={meta.icon} />
                         </span>
                         {result.band.label}
                       </div>

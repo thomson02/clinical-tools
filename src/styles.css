@@ -290,6 +290,19 @@ body {
   place-items: center;
 }
 
+.tool-icon svg {
+  width: 28px;
+  height: 28px;
+  display: block;
+}
+
+.tool-icon-img {
+  width: 30px;
+  height: 30px;
+  display: block;
+  filter: invert(36%) sepia(74%) saturate(517%) hue-rotate(143deg) brightness(92%) contrast(92%);
+}
+
 .tool-body {
   min-width: 0;
   align-self: start;
@@ -680,12 +693,19 @@ button {
 .band-icon {
   width: 26px;
   height: 26px;
-  border-radius: 8px;
+  border-radius: 0;
   display: grid;
   place-items: center;
-  background: #ffffff;
-  border: 1px solid #e2e8f0;
+  background: transparent;
+  border: none;
   font-size: 14px;
+  color: #0b2b45;
+}
+
+.band-icon svg {
+  width: 20px;
+  height: 20px;
+  display: block;
 }
 
 .band.calm {
