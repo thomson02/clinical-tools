@@ -33,6 +33,61 @@ body {
   flex-direction: column;
 }
 
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(800px 500px at 10% -10%, #dbeeea 0%, transparent 70%),
+    radial-gradient(800px 500px at 90% -20%, #cfe4ef 0%, transparent 70%),
+    linear-gradient(160deg, var(--bg), var(--bg-2));
+  animation: splashFade 2.2s ease-in-out forwards;
+}
+
+.splash-card {
+  display: grid;
+  gap: 12px;
+  place-items: center;
+  text-align: center;
+}
+
+.splash-logo {
+  width: 84px;
+  height: 84px;
+  border-radius: 26px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+  font-size: 42px;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow);
+}
+
+.splash-title {
+  font-family: 'Fraunces', serif;
+  font-size: 26px;
+}
+
+.splash-sub {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+@keyframes splashFade {
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
 .topbar {
   padding: 22px 18px 8px;
 }
@@ -150,6 +205,8 @@ body {
 .tool-cta {
   font-weight: 600;
   color: var(--accent);
+  font-size: 34px;
+  line-height: 1;
 }
 
 .card {

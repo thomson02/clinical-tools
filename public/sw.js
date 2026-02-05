@@ -5,6 +5,13 @@ const CORE_ASSETS = [
   '/manifest.webmanifest',
   '/icons/icon-192.svg',
   '/icons/icon-512.svg',
+  '/splash/splash-640x1136.png',
+  '/splash/splash-750x1334.png',
+  '/splash/splash-828x1792.png',
+  '/splash/splash-1125x2436.png',
+  '/splash/splash-1170x2532.png',
+  '/splash/splash-1242x2688.png',
+  '/splash/splash-1284x2778.png',
   '/tools/tools.json',
   '/tools/frailty.json'
 ]

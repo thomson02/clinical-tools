@@ -49,6 +49,7 @@ export default function App() {
   const [state, setState] = useState(initialState)
   const [showInstall, setShowInstall] = useState(false)
   const [updating, setUpdating] = useState(false)
+  const [showSplash, setShowSplash] = useState(true)
 
   useEffect(() => {
     const loadTools = async () => {
@@ -70,6 +71,11 @@ export default function App() {
     if (isIosDevice() && !isStandaloneMode()) {
       setShowInstall(true)
     }
+  }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowSplash(false), 2200)
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
@@ -155,6 +161,15 @@ export default function App() {
 
   return (
     <div className="app">
+      {showSplash && (
+        <div className="splash" role="status" aria-live="polite">
+          <div className="splash-card">
+            <div className="splash-logo">+</div>
+            <div className="splash-title">Clinical Tools</div>
+            <div className="splash-sub">Loading calculators…</div>
+          </div>
+        </div>
+      )}
       <header className="topbar">
         <div className="brand">
           <span className="brand-icon">+</span>
@@ -201,7 +216,7 @@ export default function App() {
                     <div className="tool-title">{tool.name}</div>
                     <div className="tool-desc">{tool.description}</div>
                   </div>
-                  <div className="tool-cta">Start</div>
+                  <div className="tool-cta" aria-hidden="true">›</div>
                 </button>
               ))}
             </div>
